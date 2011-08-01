@@ -131,22 +131,22 @@
 //
 // Do not implement Data cache
 //
-//`define OR1200_NO_DC
+`define OR1200_NO_DC
 
 //
 // Do not implement Insn cache
 //
-//`define OR1200_NO_IC
+`define OR1200_NO_IC
 
 //
 // Do not implement Data MMU
 //
-//`define OR1200_NO_DMMU
+`define OR1200_NO_DMMU
 
 //
 // Do not implement Insn MMU
 //
-//`define OR1200_NO_IMMU
+`define OR1200_NO_IMMU
 
 //
 // Select between ASIC and generic multiplier
@@ -160,13 +160,13 @@
 // Size/type of insn/data cache if implemented
 // (consider available FPGA memory resources)
 //
-//`define OR1200_IC_1W_512B
+`define OR1200_IC_1W_512B
 //`define OR1200_IC_1W_4KB
-`define OR1200_IC_1W_8KB
+//`define OR1200_IC_1W_8KB
 //`define OR1200_IC_1W_16KB
 //`define OR1200_IC_1W_32KB
-//`define OR1200_DC_1W_4KB
-`define OR1200_DC_1W_8KB
+`define OR1200_DC_1W_4KB
+//`define OR1200_DC_1W_8KB
 //`define OR1200_DC_1W_16KB
 //`define OR1200_DC_1W_32KB
 
@@ -210,7 +210,7 @@
 // Disable bursts if they are not supported by the
 // memory subsystem (only affect cache line fill)
 //
-//`define OR1200_NO_BURSTS
+`define OR1200_NO_BURSTS
 //
 
 //
@@ -247,7 +247,7 @@
 // To enable *wb_cti_o/*wb_bte_o ports,
 // define this macro.
 //
-`define OR1200_WB_B3
+//`define OR1200_WB_B3
 
 //
 // LOG all WISHBONE accesses
@@ -309,7 +309,7 @@
 // If you don't use carry bit, then disable
 // implementation to save area.
 //
-`define OR1200_IMPL_SUB
+//`define OR1200_IMPL_SUB
 
 //
 // Implement carry bit SR[CY]
@@ -730,15 +730,15 @@
 `define OR1200_EXCEPT_TRAP		`OR1200_EXCEPT_WIDTH'he
 `define OR1200_EXCEPT_FLOAT		`OR1200_EXCEPT_WIDTH'hd
 `define OR1200_EXCEPT_SYSCALL		`OR1200_EXCEPT_WIDTH'hc
-`define OR1200_EXCEPT_RANGE		`OR1200_EXCEPT_WIDTH'hb
-`define OR1200_EXCEPT_ITLBMISS		`OR1200_EXCEPT_WIDTH'ha
-`define OR1200_EXCEPT_DTLBMISS		`OR1200_EXCEPT_WIDTH'h9
+//`define OR1200_EXCEPT_RANGE		`OR1200_EXCEPT_WIDTH'hb
+//`define OR1200_EXCEPT_ITLBMISS		`OR1200_EXCEPT_WIDTH'ha
+//`define OR1200_EXCEPT_DTLBMISS		`OR1200_EXCEPT_WIDTH'h9
 `define OR1200_EXCEPT_INT		`OR1200_EXCEPT_WIDTH'h8
 `define OR1200_EXCEPT_ILLEGAL		`OR1200_EXCEPT_WIDTH'h7
 `define OR1200_EXCEPT_ALIGN		`OR1200_EXCEPT_WIDTH'h6
 `define OR1200_EXCEPT_TICK		`OR1200_EXCEPT_WIDTH'h5
-`define OR1200_EXCEPT_IPF		`OR1200_EXCEPT_WIDTH'h4
-`define OR1200_EXCEPT_DPF		`OR1200_EXCEPT_WIDTH'h3
+//`define OR1200_EXCEPT_IPF		`OR1200_EXCEPT_WIDTH'h4
+//`define OR1200_EXCEPT_DPF		`OR1200_EXCEPT_WIDTH'h3
 `define OR1200_EXCEPT_BUSERR		`OR1200_EXCEPT_WIDTH'h2
 `define OR1200_EXCEPT_RESET		`OR1200_EXCEPT_WIDTH'h1
 `define OR1200_EXCEPT_NONE		`OR1200_EXCEPT_WIDTH'h0
@@ -880,7 +880,7 @@
 //
 
 // Define it if you want DU implemented
-`define OR1200_DU_IMPLEMENTED
+//`define OR1200_DU_IMPLEMENTED
 
 //
 // Define if you want HW Breakpoints
@@ -1028,7 +1028,7 @@
 `define OR1200_PIC_IMPLEMENTED
 
 // Define number of interrupt inputs (2-31)
-`define OR1200_PIC_INTS 20
+`define OR1200_PIC_INTS 4
 
 // Address offsets of PIC registers inside PIC group
 `define OR1200_PIC_OFS_PICMR 2'd0
@@ -1414,7 +1414,7 @@
 // memory in the system). IC/DC are sitting behind QMEM so the
 // whole design timing might be worse with QMEM implemented.
 //
-//`define OR1200_QMEM_IMPLEMENTED
+`define OR1200_QMEM_IMPLEMENTED
 
 //
 // Base address and mask of QMEM
@@ -1429,24 +1429,24 @@
 // the mask, instatiated RAM/ROM will also be shadowed
 // at higher addresses in reserved space.
 //
-`define OR1200_QMEM_IADDR	32'h0080_0000
-`define OR1200_QMEM_IMASK	32'hfff0_0000 // Max QMEM size 1MB
-`define OR1200_QMEM_DADDR	32'h0080_0000
-`define OR1200_QMEM_DMASK	32'hfff0_0000 // Max QMEM size 1MB
+`define OR1200_QMEM_IADDR	32'h0000_0000
+`define OR1200_QMEM_IMASK	32'h0000_0000 // Max QMEM size 1MB
+`define OR1200_QMEM_DADDR	32'h0000_0000
+`define OR1200_QMEM_DMASK	32'h0000_0000 // Max QMEM size 1MB
 
 //
 // QMEM interface byte-select capability
 //
 // To enable qmem_sel* ports, define this macro.
 //
-//`define OR1200_QMEM_BSEL
+`define OR1200_QMEM_BSEL
 
 //
 // QMEM interface acknowledge
 //
 // To enable qmem_ack port, define this macro.
 //
-//`define OR1200_QMEM_ACK
+`define OR1200_QMEM_ACK
 
 /////////////////////////////////////////////////////
 //
