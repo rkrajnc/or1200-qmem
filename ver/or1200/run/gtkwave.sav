@@ -1,0 +1,60 @@
+[timestart] 0
+[size] 1600 1153
+[pos] -9 -5
+*-16.000000 89100 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] or1200_tb.
+@200
+-system
+@28
+or1200_tb.clk
+or1200_tb.rst
+@200
+-cpu instruction bus
+@28
+or1200_tb.icpu_cs
+@22
+or1200_tb.icpu_adr[31:0]
+or1200_tb.icpu_sel[3:0]
+@28
+or1200_tb.icpu_we
+@22
+or1200_tb.icpu_dat_r[31:0]
+@28
+or1200_tb.icpu_ack
+or1200_tb.icpu_err
+@200
+-cpu data bus
+@29
+or1200_tb.dcpu_cs
+@22
+or1200_tb.dcpu_adr[31:0]
+or1200_tb.dcpu_sel[3:0]
+@28
+or1200_tb.dcpu_we
+@22
+or1200_tb.dcpu_dat_w[31:0]
+or1200_tb.dcpu_dat_r[31:0]
+@28
+or1200_tb.dcpu_ack
+or1200_tb.dcpu_err
+@200
+-memory
+@28
+or1200_tb.cs
+@22
+or1200_tb.adr[31:0]
+or1200_tb.sel[3:0]
+@28
+or1200_tb.we
+@22
+or1200_tb.dat_w[31:0]
+or1200_tb.dat_r[31:0]
+@28
+or1200_tb.ack
+or1200_tb.err
+@200
+-arbiter
+@28
+or1200_tb.ms[1:0]
+[pattern_trace] 1
+[pattern_trace] 0
