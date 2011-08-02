@@ -302,20 +302,20 @@ assign iqmem_dat_o  = 32'hxxxxxxxx;
 //
 // QMEM and CPU/IMMU
 //
-assign qmemicpu_dat_o = qmem_iack ? iqmem_dat_i : icqmem_dat_i;
-assign qmemicpu_ack_o = qmem_iack ? 1'b1 : icqmem_ack_i;
-assign qmemimmu_rty_o = qmem_iack ? 1'b0 : icqmem_rty_i;
-assign qmemimmu_err_o = qmem_iack ? 1'b0 : icqmem_err_i;
-assign qmemimmu_tag_o = qmem_iack ? 4'h0 : icqmem_tag_i;
+assign qmemicpu_dat_o = qmem_iack ? iqmem_dat_i      : icqmem_dat_i;
+assign qmemicpu_ack_o = qmem_iack ? 1'b1             : icqmem_ack_i;
+assign qmemimmu_rty_o = qmem_iack ? 1'b0             : icqmem_rty_i;
+assign qmemimmu_err_o = qmem_iack ? 1'b0             : icqmem_err_i;
+assign qmemimmu_tag_o = qmem_iack ? 4'h0             : icqmem_tag_i;
 
 //
 // QMEM and IC
 //
-assign icqmem_adr_o = iaddr_qmem_hit ? 32'h0000_0000 : qmemimmu_adr_i;
-assign icqmem_cycstb_o = iaddr_qmem_hit ? 1'b0 : qmemimmu_cycstb_i;
-assign icqmem_ci_o = iaddr_qmem_hit ? 1'b0 : qmemimmu_ci_i;
-assign icqmem_sel_o = iaddr_qmem_hit ? 4'h0 : qmemicpu_sel_i;
-assign icqmem_tag_o = iaddr_qmem_hit ? 4'h0 : qmemicpu_tag_i;
+assign icqmem_adr_o = iaddr_qmem_hit    ? 32'h0000_0000 : qmemimmu_adr_i;
+assign icqmem_cycstb_o = iaddr_qmem_hit ? 1'b0          : qmemimmu_cycstb_i;
+assign icqmem_ci_o = iaddr_qmem_hit     ? 1'b0          : qmemimmu_ci_i;
+assign icqmem_sel_o = iaddr_qmem_hit    ? 4'h0          : qmemicpu_sel_i;
+assign icqmem_tag_o = iaddr_qmem_hit    ? 4'h0          : qmemicpu_tag_i;
 
 //
 // QMEM and CPU/DMMU
@@ -329,13 +329,13 @@ assign qmemdmmu_tag_o = daddr_qmem_hit ? 4'h0        : dcqmem_tag_i;
 //
 // QMEM and DC
 //
-assign dcqmem_adr_o = daddr_qmem_hit ? 32'h0000_0000 : qmemdmmu_adr_i;
-assign dcqmem_cycstb_o = daddr_qmem_hit ? 1'b0 : qmemdmmu_cycstb_i;
-assign dcqmem_ci_o = daddr_qmem_hit ? 1'b0 : qmemdmmu_ci_i;
-assign dcqmem_we_o = daddr_qmem_hit ? 1'b0 : qmemdcpu_we_i;
-assign dcqmem_sel_o = daddr_qmem_hit ? 4'h0 : qmemdcpu_sel_i;
-assign dcqmem_tag_o = daddr_qmem_hit ? 4'h0 : qmemdcpu_tag_i;
-assign dcqmem_dat_o = daddr_qmem_hit ? 32'h0000_0000 : qmemdcpu_dat_i;
+assign dcqmem_adr_o = daddr_qmem_hit    ? 32'h0000_0000 : qmemdmmu_adr_i;
+assign dcqmem_cycstb_o = daddr_qmem_hit ? 1'b0          : qmemdmmu_cycstb_i;
+assign dcqmem_ci_o = daddr_qmem_hit     ? 1'b0          : qmemdmmu_ci_i;
+assign dcqmem_we_o = daddr_qmem_hit     ? 1'b0          : qmemdcpu_we_i;
+assign dcqmem_sel_o = daddr_qmem_hit    ? 4'h0          : qmemdcpu_sel_i;
+assign dcqmem_tag_o = daddr_qmem_hit    ? 4'h0          : qmemdcpu_tag_i;
+assign dcqmem_dat_o = daddr_qmem_hit    ? 32'h0000_0000 : qmemdcpu_dat_i;
 
 //
 // Address comparison whether QMEM was hit
