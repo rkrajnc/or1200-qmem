@@ -210,7 +210,7 @@
 // Disable bursts if they are not supported by the
 // memory subsystem (only affect cache line fill)
 //
-`define OR1200_NO_BURSTS
+//`define OR1200_NO_BURSTS
 //
 
 //
@@ -247,7 +247,7 @@
 // To enable *wb_cti_o/*wb_bte_o ports,
 // define this macro.
 //
-//`define OR1200_WB_B3
+`define OR1200_WB_B3
 
 //
 // LOG all WISHBONE accesses
