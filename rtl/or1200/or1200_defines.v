@@ -351,7 +351,7 @@
 //
 // Implement Find First/Last '1'
 //
-`define OR1200_IMPL_ALU_FFL1
+//`define OR1200_IMPL_ALU_FFL1
 
 //
 // Implement multiplier
@@ -711,9 +711,9 @@
 //
 // Sum of these two defines needs to be 28
 //
-`define OR1200_EXCEPT_EPH0_P    20'h00000
-`define OR1200_EXCEPT_EPH1_P    20'hF0000
-`define OR1200_EXCEPT_V		    8'h00
+`define OR1200_EXCEPT_EPH0_P    26'h0000000
+`define OR1200_EXCEPT_EPH1_P    26'h1000000
+`define OR1200_EXCEPT_V		      2'h0
 
 //
 // N part width
@@ -1054,7 +1054,7 @@
 //
 
 // Define it if you want TT implemented
-`define OR1200_TT_IMPLEMENTED
+//`define OR1200_TT_IMPLEMENTED
 
 // Address offsets of TT registers inside TT group
 `define OR1200_TT_OFS_TTMR 1'd0
@@ -1775,9 +1775,9 @@
 // comment below.                                                            //
 //                                                                           //
 ///////////////////////////////////////////////////////////////////////////////
-// Boot from 0xf0000100
-//`define OR1200_BOOT_PCREG_DEFAULT 30'h3c00003f
-//`define OR1200_BOOT_ADR 32'hf0000100
+// Boot from 0x00000004
+`define OR1200_BOOT_PCREG_DEFAULT 30'h00000000
+`define OR1200_BOOT_ADR 32'h00000004
 // Boot from 0x100
- `define OR1200_BOOT_PCREG_DEFAULT 30'h0000003f
- `define OR1200_BOOT_ADR 32'h00000100
+// `define OR1200_BOOT_PCREG_DEFAULT 30'h0000003f
+// `define OR1200_BOOT_ADR 32'h00000100
