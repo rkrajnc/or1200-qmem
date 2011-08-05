@@ -93,6 +93,27 @@ module or1200_qmem_top(
 	mbist_si_i, mbist_so_o, mbist_ctrl_i,
 `endif
 
+`ifdef OR1200_QMEM_IMPLEMENTED
+  du_stall,
+
+  dqmem_cs_o,
+  dqmem_we_o,
+  dqmem_sel_o,
+  dqmem_adr_o,
+  dqmem_dat_o,
+  dqmem_dat_i,
+  dqmem_ack_i,
+  dqmem_err_i,
+  iqmem_cs_o,
+  iqmem_we_o,
+  iqmem_sel_o,
+  iqmem_adr_o,
+  iqmem_dat_o,
+  iqmem_dat_i,
+  iqmem_ack_i,
+  iqmem_err_i,
+`endif
+
 	// QMEM and CPU/IMMU
 	qmemimmu_adr_i,
 	qmemimmu_cycstb_i,
@@ -168,6 +189,30 @@ input [`OR1200_MBIST_CTRL_WIDTH - 1:0] mbist_ctrl_i;
 output mbist_so_o;
 `endif
 
+`ifdef OR1200_QMEM_IMPLEMENTED
+input           du_stall;
+
+//
+// QMEM bus
+//
+output          dqmem_cs_o;
+output          dqmem_we_o;
+output    [3:0] dqmem_sel_o;
+output   [31:0] dqmem_adr_o;
+output   [31:0] dqmem_dat_o;
+input    [31:0] dqmem_dat_i;
+input           dqmem_ack_i;
+input           dqmem_err_i;
+output          iqmem_cs_o;
+output          iqmem_we_o;
+output    [3:0] iqmem_sel_o;
+output   [31:0] iqmem_adr_o;
+output   [31:0] iqmem_dat_o;
+input    [31:0] iqmem_dat_i;
+input           iqmem_ack_i;
+input           iqmem_err_i;
+`endif
+
 //
 // QMEM and CPU/IMMU
 //
@@ -235,60 +280,62 @@ input	[3:0]			dcqmem_tag_i;
 //
 wire				iaddr_qmem_hit;
 wire				daddr_qmem_hit;
-reg	[2:0]			state;
 reg				qmem_dack;
 reg				qmem_iack;
-wire	[31:0]			qmem_di;
-wire	[31:0]			qmem_do;
-wire				qmem_en;
-wire				qmem_we;
-`ifdef OR1200_QMEM_BSEL
-wire  [3:0]       qmem_sel;
-`endif
-wire	[31:0]			qmem_addr;
-`ifdef OR1200_QMEM_ACK
-wire              qmem_ack;
-`else
-wire              qmem_ack = 1'b1;
-`endif
+reg				qmem_derr;
+reg				qmem_ierr;
+
+//
+// QMEM
+//
+assign dqmem_cs_o   = daddr_qmem_hit & qmemdmmu_cycstb_i;
+assign dqmem_we_o   = qmemdmmu_cycstb_i & daddr_qmem_hit & qmemdcpu_we_i;
+assign dqmem_sel_o  = qmemdcpu_sel_i;
+assign dqmem_adr_o  = qmemdmmu_adr_i;
+assign dqmem_dat_o  = qmemdcpu_dat_i;
+assign iqmem_cs_o   = iaddr_qmem_hit & qmemimmu_cycstb_i;
+assign iqmem_we_o   = 1'b0;
+assign iqmem_sel_o  = qmemicpu_sel_i;
+assign iqmem_adr_o  = qmemimmu_adr_i;
+assign iqmem_dat_o  = 32'hxxxxxxxx;
 
 //
 // QMEM and CPU/IMMU
 //
-assign qmemicpu_dat_o = qmem_iack ? qmem_do : icqmem_dat_i;
-assign qmemicpu_ack_o = qmem_iack ? 1'b1 : icqmem_ack_i;
-assign qmemimmu_rty_o = qmem_iack ? 1'b0 : icqmem_rty_i;
-assign qmemimmu_err_o = qmem_iack ? 1'b0 : icqmem_err_i;
-assign qmemimmu_tag_o = qmem_iack ? 4'h0 : icqmem_tag_i;
+assign qmemicpu_dat_o = qmem_iack ? iqmem_dat_i      : icqmem_dat_i;
+assign qmemicpu_ack_o = qmem_iack ? 1'b1             : icqmem_ack_i;
+assign qmemimmu_rty_o = qmem_iack ? 1'b0             : icqmem_rty_i;
+assign qmemimmu_err_o = qmem_iack ? 1'b0             : icqmem_err_i;
+assign qmemimmu_tag_o = qmem_iack ? 4'h0             : icqmem_tag_i;
 
 //
 // QMEM and IC
 //
-assign icqmem_adr_o = iaddr_qmem_hit ? 32'h0000_0000 : qmemimmu_adr_i;
-assign icqmem_cycstb_o = iaddr_qmem_hit ? 1'b0 : qmemimmu_cycstb_i;
-assign icqmem_ci_o = iaddr_qmem_hit ? 1'b0 : qmemimmu_ci_i;
-assign icqmem_sel_o = iaddr_qmem_hit ? 4'h0 : qmemicpu_sel_i;
-assign icqmem_tag_o = iaddr_qmem_hit ? 4'h0 : qmemicpu_tag_i;
+assign icqmem_adr_o = iaddr_qmem_hit    ? 32'h0000_0000 : qmemimmu_adr_i;
+assign icqmem_cycstb_o = iaddr_qmem_hit ? 1'b0          : qmemimmu_cycstb_i;
+assign icqmem_ci_o = iaddr_qmem_hit     ? 1'b0          : qmemimmu_ci_i;
+assign icqmem_sel_o = iaddr_qmem_hit    ? 4'h0          : qmemicpu_sel_i;
+assign icqmem_tag_o = iaddr_qmem_hit    ? 4'h0          : qmemicpu_tag_i;
 
 //
 // QMEM and CPU/DMMU
 //
-assign qmemdcpu_dat_o = daddr_qmem_hit ? qmem_do : dcqmem_dat_i;
-assign qmemdcpu_ack_o = daddr_qmem_hit ? qmem_dack : dcqmem_ack_i;
-assign qmemdcpu_rty_o = daddr_qmem_hit ? ~qmem_dack : dcqmem_rty_i;
-assign qmemdmmu_err_o = daddr_qmem_hit ? 1'b0 : dcqmem_err_i;
-assign qmemdmmu_tag_o = daddr_qmem_hit ? 4'h0 : dcqmem_tag_i;
+assign qmemdcpu_dat_o = daddr_qmem_hit ? dqmem_dat_i : dcqmem_dat_i;
+assign qmemdcpu_ack_o = daddr_qmem_hit ? qmem_dack   : dcqmem_ack_i;
+assign qmemdcpu_rty_o = daddr_qmem_hit ? ~qmem_dack  : dcqmem_rty_i;
+assign qmemdmmu_err_o = daddr_qmem_hit ? qmem_derr   : dcqmem_err_i;
+assign qmemdmmu_tag_o = daddr_qmem_hit ? 4'h0        : dcqmem_tag_i;
 
 //
 // QMEM and DC
 //
-assign dcqmem_adr_o = daddr_qmem_hit ? 32'h0000_0000 : qmemdmmu_adr_i;
-assign dcqmem_cycstb_o = daddr_qmem_hit ? 1'b0 : qmemdmmu_cycstb_i;
-assign dcqmem_ci_o = daddr_qmem_hit ? 1'b0 : qmemdmmu_ci_i;
-assign dcqmem_we_o = daddr_qmem_hit ? 1'b0 : qmemdcpu_we_i;
-assign dcqmem_sel_o = daddr_qmem_hit ? 4'h0 : qmemdcpu_sel_i;
-assign dcqmem_tag_o = daddr_qmem_hit ? 4'h0 : qmemdcpu_tag_i;
-assign dcqmem_dat_o = daddr_qmem_hit ? 32'h0000_0000 : qmemdcpu_dat_i;
+assign dcqmem_adr_o = daddr_qmem_hit    ? 32'h0000_0000 : qmemdmmu_adr_i;
+assign dcqmem_cycstb_o = daddr_qmem_hit ? 1'b0          : qmemdmmu_cycstb_i;
+assign dcqmem_ci_o = daddr_qmem_hit     ? 1'b0          : qmemdmmu_ci_i;
+assign dcqmem_we_o = daddr_qmem_hit     ? 1'b0          : qmemdcpu_we_i;
+assign dcqmem_sel_o = daddr_qmem_hit    ? 4'h0          : qmemdcpu_sel_i;
+assign dcqmem_tag_o = daddr_qmem_hit    ? 4'h0          : qmemdcpu_tag_i;
+assign dcqmem_dat_o = daddr_qmem_hit    ? 32'h0000_0000 : qmemdcpu_dat_i;
 
 //
 // Address comparison whether QMEM was hit
@@ -306,141 +353,39 @@ assign daddr_qmem_hit = 1'b0;
 `endif
 
 //
+// QMEM ack
 //
-//
-assign qmem_en = iaddr_qmem_hit & qmemimmu_cycstb_i | daddr_qmem_hit & qmemdmmu_cycstb_i;
-assign qmem_we = qmemdmmu_cycstb_i & daddr_qmem_hit & qmemdcpu_we_i;
-`ifdef OR1200_QMEM_BSEL
-assign qmem_sel = (qmemdmmu_cycstb_i & daddr_qmem_hit) ? qmemdcpu_sel_i : qmemicpu_sel_i;
-`endif
-assign qmem_di = qmemdcpu_dat_i;
-assign qmem_addr = (qmemdmmu_cycstb_i & daddr_qmem_hit) ? qmemdmmu_adr_i : qmemimmu_adr_i;
+always @(posedge rst or posedge clk)
+begin
+  if (rst) begin
+    qmem_dack <= #1 1'b0;
+    qmem_iack <= #1 1'b0;
+  end else if(du_stall) begin
+    qmem_dack <= #1 1'b0;
+    qmem_iack <= #1 1'b0;
+  end else begin
+    qmem_dack <= #1 dqmem_ack_i;
+    qmem_iack <= #1 iqmem_ack_i;
+  end
+end
 
 //
-// QMEM control FSM
+// QMEM err
 //
-always @(`OR1200_RST_EVENT rst or posedge clk)
-	if (rst == `OR1200_RST_VALUE) begin
-		state <=  `OR1200_QMEMFSM_IDLE;
-		qmem_dack <=  1'b0;
-		qmem_iack <=  1'b0;
-	end
-	else case (state)	// synopsys parallel_case
-		`OR1200_QMEMFSM_IDLE: begin
-			if (qmemdmmu_cycstb_i & daddr_qmem_hit & qmemdcpu_we_i & qmem_ack) begin
-				state <=  `OR1200_QMEMFSM_STORE;
-				qmem_dack <=  1'b1;
-				qmem_iack <=  1'b0;
-			end
-			else if (qmemdmmu_cycstb_i & daddr_qmem_hit & qmem_ack) begin
-				state <=  `OR1200_QMEMFSM_LOAD;
-				qmem_dack <=  1'b1;
-				qmem_iack <=  1'b0;
-			end
-			else if (qmemimmu_cycstb_i & iaddr_qmem_hit & qmem_ack) begin
-				state <=  `OR1200_QMEMFSM_FETCH;
-				qmem_iack <=  1'b1;
-				qmem_dack <=  1'b0;
-			end
-		end
-		`OR1200_QMEMFSM_STORE: begin
-			if (qmemdmmu_cycstb_i & daddr_qmem_hit & qmemdcpu_we_i & qmem_ack) begin
-				state <=  `OR1200_QMEMFSM_STORE;
-				qmem_dack <=  1'b1;
-				qmem_iack <=  1'b0;
-			end
-			else if (qmemdmmu_cycstb_i & daddr_qmem_hit & qmem_ack) begin
-				state <=  `OR1200_QMEMFSM_LOAD;
-				qmem_dack <=  1'b1;
-				qmem_iack <=  1'b0;
-			end
-			else if (qmemimmu_cycstb_i & iaddr_qmem_hit & qmem_ack) begin
-				state <=  `OR1200_QMEMFSM_FETCH;
-				qmem_iack <=  1'b1;
-				qmem_dack <=  1'b0;
-			end
-			else begin
-				state <=  `OR1200_QMEMFSM_IDLE;
-				qmem_dack <=  1'b0;
-				qmem_iack <=  1'b0;
-			end
-		end
-		`OR1200_QMEMFSM_LOAD: begin
-			if (qmemdmmu_cycstb_i & daddr_qmem_hit & qmemdcpu_we_i & qmem_ack) begin
-				state <=  `OR1200_QMEMFSM_STORE;
-				qmem_dack <=  1'b1;
-				qmem_iack <=  1'b0;
-			end
-			else if (qmemdmmu_cycstb_i & daddr_qmem_hit & qmem_ack) begin
-				state <=  `OR1200_QMEMFSM_LOAD;
-				qmem_dack <=  1'b1;
-				qmem_iack <=  1'b0;
-			end
-			else if (qmemimmu_cycstb_i & iaddr_qmem_hit & qmem_ack) begin
-				state <=  `OR1200_QMEMFSM_FETCH;
-				qmem_iack <=  1'b1;
-				qmem_dack <=  1'b0;
-			end
-			else begin
-				state <=  `OR1200_QMEMFSM_IDLE;
-				qmem_dack <=  1'b0;
-				qmem_iack <=  1'b0;
-			end
-		end
-		`OR1200_QMEMFSM_FETCH: begin
-			if (qmemdmmu_cycstb_i & daddr_qmem_hit & qmemdcpu_we_i & qmem_ack) begin
-				state <=  `OR1200_QMEMFSM_STORE;
-				qmem_dack <=  1'b1;
-				qmem_iack <=  1'b0;
-			end
-			else if (qmemdmmu_cycstb_i & daddr_qmem_hit & qmem_ack) begin
-				state <=  `OR1200_QMEMFSM_LOAD;
-				qmem_dack <=  1'b1;
-				qmem_iack <=  1'b0;
-			end
-			else if (qmemimmu_cycstb_i & iaddr_qmem_hit & qmem_ack) begin
-				state <=  `OR1200_QMEMFSM_FETCH;
-				qmem_iack <=  1'b1;
-				qmem_dack <=  1'b0;
-			end
-			else begin
-				state <=  `OR1200_QMEMFSM_IDLE;
-				qmem_dack <=  1'b0;
-				qmem_iack <=  1'b0;
-			end
-		end
-		default: begin
-			state <=  `OR1200_QMEMFSM_IDLE;
-			qmem_dack <=  1'b0;
-			qmem_iack <=  1'b0;
-		end
-	endcase
+always @(posedge rst or posedge clk)
+begin
+  if (rst) begin
+    qmem_derr <= #1 1'b0;
+    qmem_ierr <= #1 1'b0;
+  end else if(du_stall) begin
+    qmem_derr <= #1 1'b0;
+    qmem_ierr <= #1 1'b0;
+  end else begin
+    qmem_derr <= #1 dqmem_err_i;
+    qmem_ierr <= #1 iqmem_err_i;
+  end
+end
 
-//
-// Instantiation of embedded memory
-//
-or1200_spram_2048x32 or1200_qmem_ram(
-	.clk(clk),
-	.rst(rst),
-`ifdef OR1200_BIST
-	// RAM BIST
-	.mbist_si_i(mbist_si_i),
-	.mbist_so_o(mbist_so_o),
-	.mbist_ctrl_i(mbist_ctrl_i),
-`endif
-	.addr(qmem_addr[12:2]),
-`ifdef OR1200_QMEM_BSEL
-	.sel(qmem_sel),
-`endif
-`ifdef OR1200_QMEM_ACK
-  .ack(qmem_ack),
-`endif
-  .ce(qmem_en),
-	.we(qmem_we),
-	.oe(1'b1),
-	.di(qmem_di),
-	.doq(qmem_do)
-);
 
 `else  // OR1200_QMEM_IMPLEMENTED
 

@@ -85,6 +85,12 @@ module or1200_top(
 	// RAM BIST
 	mbist_si_i, mbist_so_o, mbist_ctrl_i,
 `endif
+
+`ifdef OR1200_QMEM_IMPLEMENTED
+  dqmem_cs_o, dqmem_we_o, dqmem_sel_o, dqmem_adr_o, dqmem_dat_o, dqmem_dat_i, dqmem_ack_i, dqmem_err_i,
+  iqmem_cs_o, iqmem_we_o, iqmem_sel_o, iqmem_adr_o, iqmem_dat_o, iqmem_dat_i, iqmem_ack_i, iqmem_err_i,
+`endif
+
 	// Power Management
 	pm_cpustall_i,
 	pm_clksd_o, pm_dc_gate_o, pm_ic_gate_o, pm_dmmu_gate_o, 
@@ -179,6 +185,28 @@ output			dbg_ack_o;	// External Data Acknowledge (not WB compatible)
 input mbist_si_i;
 input [`OR1200_MBIST_CTRL_WIDTH - 1:0] mbist_ctrl_i;
 output mbist_so_o;
+`endif
+
+`ifdef OR1200_QMEM_IMPLEMENTED
+//
+// QMEM bus
+//
+output          dqmem_cs_o;
+output          dqmem_we_o;
+output    [3:0] dqmem_sel_o;
+output   [31:0] dqmem_adr_o;
+output   [31:0] dqmem_dat_o;
+input    [31:0] dqmem_dat_i;
+input           dqmem_ack_i;
+input           dqmem_err_i;
+output          iqmem_cs_o;
+output          iqmem_we_o;
+output    [3:0] iqmem_sel_o;
+output   [31:0] iqmem_adr_o;
+output   [31:0] iqmem_dat_o;
+input    [31:0] iqmem_dat_i;
+input           iqmem_ack_i;
+input           iqmem_err_i;
 `endif
 
 //
@@ -811,6 +839,27 @@ or1200_qmem_top or1200_qmem_top(
 	.mbist_si_i(mbist_qmem_si),
 	.mbist_so_o(mbist_qmem_so),
 	.mbist_ctrl_i(mbist_ctrl_i),
+`endif
+
+`ifdef OR1200_QMEM_IMPLEMENTED
+  .du_stall    (du_stall   ),
+  // QMEM
+  .dqmem_cs_o  (dqmem_cs_o ),
+  .dqmem_we_o  (dqmem_we_o ),
+  .dqmem_sel_o (dqmem_sel_o),
+  .dqmem_adr_o (dqmem_adr_o),
+  .dqmem_dat_o (dqmem_dat_o),
+  .dqmem_dat_i (dqmem_dat_i),
+  .dqmem_ack_i (dqmem_ack_i),
+  .dqmem_err_i (dqmem_err_i),
+  .iqmem_cs_o  (iqmem_cs_o ),
+  .iqmem_we_o  (iqmem_we_o ),
+  .iqmem_sel_o (iqmem_sel_o),
+  .iqmem_adr_o (iqmem_adr_o),
+  .iqmem_dat_o (iqmem_dat_o),
+  .iqmem_dat_i (iqmem_dat_i),
+  .iqmem_ack_i (iqmem_ack_i),
+  .iqmem_err_i (iqmem_err_i),
 `endif
 
 	// QMEM and CPU/IMMU
